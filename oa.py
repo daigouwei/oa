@@ -10,17 +10,28 @@ import time
 
 def commandLineInterface():
     url = 'http://172.26.10.41/Programs/login/login.aspx'
-    username = input('请输入你的工号: ')
-    password = input('请输入你的密码: ')
 
     #登录账号，后期还需要对输错密码进行处理
-    # browser = webdriver.PhantomJS()
-    browser = webdriver.Chrome()
-    browser.get(url)
-    browser.find_element_by_name('tbUserName').send_keys(username)
-    browser.find_element_by_name('tbPassword').send_keys(password)
-    browser.find_element_by_name('btnLogin').click()
-    # print(browser.page_source)
+    browser = webdriver.PhantomJS()
+    # browser = webdriver.Chrome()
+    successInFlag = False
+    while(successInFlag == False):
+        browser.get(url)
+        username = input('请输入用户名: ')
+        password = input('请输入密码:   ')
+        browser.find_element_by_name('tbUserName').send_keys(username)
+        browser.find_element_by_name('tbPassword').send_keys(password)
+        browser.find_element_by_name('btnLogin').click()
+        # print(browser.page_source)
+
+        soup = BeautifulSoup(browser.page_source, 'lxml')
+        soupStr = soup.find_all(id="lblMsg")
+        failIn = re.findall(re.compile(r'<span id="lblMsg"><span style="color:Red">(.*?)</span></span>', re.S), str(soupStr))
+        if(failIn):
+            if failIn[0] == '用户名或密码不正确！':
+                print('\n' + failIn[0] + '请重试......')
+        else:
+            successInFlag = True
 
     #提取date week firsttime lasttime信息并进行处理
     browser.switch_to_frame('contents') #切换frame，点击进入考勤统计
@@ -101,8 +112,8 @@ def commandLineInterface():
         calendarLists = soup.find_all('td', bgcolor='white')
         calendarDict = {}
         for calendarList in calendarLists:
-            # data = re.findall(re.compile(r'<td bgcolor="white" class="dt" id="(.*?)" style="font-weight: bold; cursor: pointer; color:.*?; ">(.*?)</td>', re.S), str(calendarList)) #这是PhantomJS的正则
-            data = re.findall(re.compile(r'<td bgcolor="white" class="dt" id="(.*?)" style="font-weight: bold; cursor: pointer; color:.*?;">(.*?)</td>', re.S), str(calendarList)) #这是chrome的正则，相差最后一个空格
+            data = re.findall(re.compile(r'<td bgcolor="white" class="dt" id="(.*?)" style="font-weight: bold; cursor: pointer; color:.*?; ">(.*?)</td>', re.S), str(calendarList)) #这是PhantomJS的正则
+            # data = re.findall(re.compile(r'<td bgcolor="white" class="dt" id="(.*?)" style="font-weight: bold; cursor: pointer; color:.*?;">(.*?)</td>', re.S), str(calendarList)) #这是chrome的正则，相差最后一个空格
             calendarDict[data[0][1]] = data[0][0]
         # print(calendarDict)
 
