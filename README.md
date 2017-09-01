@@ -6,7 +6,7 @@ Based on environment of Python3.
 1.preparatory work  
 git clone https://github.com/daigouwei/oa.git  
 cd oa  
-sudo apt-get install python3.4-venv python3-dev  
+sudo apt-get install python3.4-venv python3-dev libxslt1-dev phantomjs  
 python3.4 -m venv venv.oa  
 source venv.oa/bin/activate  
 pip install -r requirements.txt  
