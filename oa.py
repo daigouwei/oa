@@ -81,13 +81,15 @@ def commandLineInterface():
         pt.add_row(sf)
     print(pt)
 
-    defaultReason = input('请输入懒人专属加班事由(下面直接回车的就会加载该默认加班事由): ')
+    # defaultReason = input('请输入懒人专属加班事由(下面直接回车的就会加载该默认加班事由): ')
+    print('\n[NOTE]加班事由直接按回车会默认同步最近的加班事由!\n')
     for sf in overtimeDataHandle:
         overtimeReason = input('请输入%s号的加班事由: ' % sf[0])
         if overtimeReason == '':
             sf.append(defaultReason)
         else:
             sf.append(overtimeReason)
+            defaultReason = overtimeReason
     # print(overtimeDataHandle)
 
     headline = '日期 星期 加班刷卡 下班刷卡 加班事由'.split()
@@ -97,7 +99,9 @@ def commandLineInterface():
         pt.add_row(sf)
     print(pt)
 
+    print('\n')
     confirm = input('请对照上表确认无误，输入yes开始进行申请： ')
+    print('\n')
     if confirm == 'yes':
         #切换frame点击进入加班申请，解析日历等
         browser.switch_to_default_content()
