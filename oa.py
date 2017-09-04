@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 #-*- coding:utf-8 -*-
 
+import getpass
 import re
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -11,14 +12,15 @@ import time
 def commandLineInterface():
     url = 'http://172.26.10.41/Programs/login/login.aspx'
 
-    #登录账号，后期还需要对输错密码进行处理
+    #登录账号
     browser = webdriver.PhantomJS()
     # browser = webdriver.Chrome()
     successInFlag = False
     while(successInFlag == False):
         browser.get(url)
         username = input('请输入用户名: ')
-        password = input('请输入密码:   ')
+        # password = input('请输入密码:   ')
+        password = getpass.getpass('请输入密码:   ')
         browser.find_element_by_name('tbUserName').send_keys(username)
         browser.find_element_by_name('tbPassword').send_keys(password)
         browser.find_element_by_name('btnLogin').click()
@@ -175,6 +177,7 @@ def commandLineInterface():
     #退出浏览器
     browser.quit()
 
+    print('WINNER WINNER, CHICKEN DINNER!')
 
 if __name__ == '__main__':
     commandLineInterface()
