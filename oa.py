@@ -10,6 +10,12 @@ from prettytable import PrettyTable
 import time
 
 def commandLineInterface():
+
+    print('\n[NOTE]禁止运行该脚本的同时登录oa！')
+    print('[NOTE]密码使用类UNIX是不回显的！')
+    print('[NOTE]oa系统要求加班事由控制在60字符！')
+    print('[NOTE]直接按回车将会同步最近的有效加班事由!\n')
+
     url = 'http://172.26.10.41/Programs/login/login.aspx'
 
     #登录账号
@@ -31,7 +37,7 @@ def commandLineInterface():
         failIn = re.findall(re.compile(r'<span id="lblMsg"><span style="color:Red">(.*?)</span></span>', re.S), str(soupStr))
         if(failIn):
             if failIn[0] == '用户名或密码不正确！':
-                print('\n' + failIn[0] + '请重试......')
+                print('\n' + failIn[0] + '请重试...')
         else:
             successInFlag = True
 
@@ -83,8 +89,7 @@ def commandLineInterface():
         pt.add_row(sf)
     print(pt)
 
-    # defaultReason = input('请输入懒人专属加班事由(下面直接回车的就会加载该默认加班事由): ')
-    print('\n[NOTE]加班事由直接按回车会默认同步最近的加班事由!\n')
+    defaultReason = '工作需要'
     for sf in overtimeDataHandle:
         overtimeReason = input('请输入%s号的加班事由: ' % sf[0])
         if overtimeReason == '':
