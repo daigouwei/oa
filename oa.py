@@ -107,77 +107,81 @@ def commandLineInterface():
     print(pt)
 
     print('\n')
-    confirm = input('请对照上表确认无误，输入yes开始进行申请： ')
-    print('\n')
-    if confirm == 'yes':
-        #切换frame点击进入加班申请，解析日历等
-        browser.switch_to_default_content()
-        browser.switch_to_frame('contents')
-        browser.find_element_by_id('a4').click()
-        browser.switch_to_default_content()
-        browser.switch_to_frame('main')
-        browser.find_element_by_id('TextBoxDATE_FROM').click() #点击起始日期
-        browser.switch_to_frame('CalFrame') #切换frame进入日历
-        browser.find_element_by_xpath(r'//img[@src="prev.gif"]').click() #点击日历中上个月箭头切换至上个月的日历信息
-        soup = BeautifulSoup(browser.page_source, 'lxml')
-        calendarLists = soup.find_all('td', bgcolor='white')
-        calendarDict = {}
-        for calendarList in calendarLists:
-            data = re.findall(re.compile(r'<td bgcolor="white" class="dt" id="(.*?)" style="font-weight: bold; cursor: pointer; color:.*?; ">(.*?)</td>', re.S), str(calendarList)) #这是PhantomJS的正则
-            # data = re.findall(re.compile(r'<td bgcolor="white" class="dt" id="(.*?)" style="font-weight: bold; cursor: pointer; color:.*?;">(.*?)</td>', re.S), str(calendarList)) #这是chrome的正则，相差最后一个空格
-            calendarDict[data[0][1]] = data[0][0]
-        # print(calendarDict)
 
-        #进行具体加班申请操作
-        firstOvertimeFlag = True
-        for qop in overtimeDataHandle:
-            if not firstOvertimeFlag:
-                browser.find_element_by_id('btnNew').click()  #点击新建申请
-                browser.find_element_by_name('TextBoxREASON').send_keys(qop[4])  #输入加班事由
-                browser.find_element_by_id('TextBoxDATE_FROM').click()  #点击起始日期
-                browser.switch_to_frame('CalFrame')  #切换frame进入日历
-                browser.find_element_by_xpath(r'//img[@src="prev.gif"]').click()  #点击日历中上个月箭头切换至上个月的日历信息
-                browser.find_element_by_id(calendarDict[qop[0]]).click()
-                browser.switch_to_default_content()
-                browser.switch_to_frame('main')
-                browser.find_element_by_id('TextBoxDATE_TO').click()
-                browser.switch_to_frame('CalFrame')  #切换frame进入日历
-                browser.find_element_by_xpath(r'//img[@src="prev.gif"]').click()  #点击日历中上个月箭头切换至上个月的日历信息
-                browser.find_element_by_id(calendarDict[qop[0]]).click()
-                browser.switch_to_default_content()
-                browser.switch_to_frame('main')
-                selectTimeFrom = Select(browser.find_element_by_name('DropDownListTIME_FROM'))
-                selectTimeFrom.select_by_visible_text(qop[2])
-                selectTimeTo = Select(browser.find_element_by_name('DropDownListTIME_TO'))
-                selectTimeTo.select_by_visible_text(qop[3])
-                # time.sleep(int(delaytime))
-                browser.find_element_by_id('btnAddLine').click()  #添加明细
-                time.sleep(3)  #延时，防止提交按钮丢失
-                browser.find_element_by_id('btnPost').click()  #提交
-                print('%s号加班申请完成...' % (qop[0]))
-                # browser.find_element_by_id('btnCancel').click()  #取消申请
-            else:
-                firstOvertimeFlag = False
-                browser.find_element_by_id(calendarDict[qop[0]]).click()
-                browser.switch_to_default_content()
-                browser.switch_to_frame('main')
-                browser.find_element_by_name('TextBoxREASON').send_keys(qop[4])  #输入加班事由
-                browser.find_element_by_id('TextBoxDATE_TO').click()
-                browser.switch_to_frame('CalFrame')  #切换frame进入日历
-                browser.find_element_by_xpath(r'//img[@src="prev.gif"]').click()  #点击日历中上个月箭头切换至上个月的日历信息
-                browser.find_element_by_id(calendarDict[qop[0]]).click()
-                browser.switch_to_default_content()
-                browser.switch_to_frame('main')
-                selectTimeFrom = Select(browser.find_element_by_name('DropDownListTIME_FROM'))
-                selectTimeFrom.select_by_visible_text(qop[2])
-                selectTimeTo = Select(browser.find_element_by_name('DropDownListTIME_TO'))
-                selectTimeTo.select_by_visible_text(qop[3])
-                # time.sleep(int(delaytime))
-                browser.find_element_by_id('btnAddLine').click()  #添加明细
-                time.sleep(3)  #延时，防止提交按钮丢失
-                browser.find_element_by_id('btnPost').click()  #提交
-                print('%s号加班申请完成...' % (qop[0]))
-                # browser.find_element_by_id('btnCancel').click()  #取消申请
+    yesFlag = False
+    while(yesFlag == False):
+        confirm = input('请对照上表确认无误，输入yes开始进行申请，放弃请Ctrl+C： ')
+        if confirm == 'yes':
+            yesFlag = True
+            print('\n')
+            #切换frame点击进入加班申请，解析日历等
+            browser.switch_to_default_content()
+            browser.switch_to_frame('contents')
+            browser.find_element_by_id('a4').click()
+            browser.switch_to_default_content()
+            browser.switch_to_frame('main')
+            browser.find_element_by_id('TextBoxDATE_FROM').click() #点击起始日期
+            browser.switch_to_frame('CalFrame') #切换frame进入日历
+            browser.find_element_by_xpath(r'//img[@src="prev.gif"]').click() #点击日历中上个月箭头切换至上个月的日历信息
+            soup = BeautifulSoup(browser.page_source, 'lxml')
+            calendarLists = soup.find_all('td', bgcolor='white')
+            calendarDict = {}
+            for calendarList in calendarLists:
+                data = re.findall(re.compile(r'<td bgcolor="white" class="dt" id="(.*?)" style="font-weight: bold; cursor: pointer; color:.*?; ">(.*?)</td>', re.S), str(calendarList)) #这是PhantomJS的正则
+                # data = re.findall(re.compile(r'<td bgcolor="white" class="dt" id="(.*?)" style="font-weight: bold; cursor: pointer; color:.*?;">(.*?)</td>', re.S), str(calendarList)) #这是chrome的正则，相差最后一个空格
+                calendarDict[data[0][1]] = data[0][0]
+            # print(calendarDict)
+
+            #进行具体加班申请操作
+            firstOvertimeFlag = True
+            for qop in overtimeDataHandle:
+                if not firstOvertimeFlag:
+                    browser.find_element_by_id('btnNew').click()  #点击新建申请
+                    browser.find_element_by_name('TextBoxREASON').send_keys(qop[4])  #输入加班事由
+                    browser.find_element_by_id('TextBoxDATE_FROM').click()  #点击起始日期
+                    browser.switch_to_frame('CalFrame')  #切换frame进入日历
+                    browser.find_element_by_xpath(r'//img[@src="prev.gif"]').click()  #点击日历中上个月箭头切换至上个月的日历信息
+                    browser.find_element_by_id(calendarDict[qop[0]]).click()
+                    browser.switch_to_default_content()
+                    browser.switch_to_frame('main')
+                    browser.find_element_by_id('TextBoxDATE_TO').click()
+                    browser.switch_to_frame('CalFrame')  #切换frame进入日历
+                    browser.find_element_by_xpath(r'//img[@src="prev.gif"]').click()  #点击日历中上个月箭头切换至上个月的日历信息
+                    browser.find_element_by_id(calendarDict[qop[0]]).click()
+                    browser.switch_to_default_content()
+                    browser.switch_to_frame('main')
+                    selectTimeFrom = Select(browser.find_element_by_name('DropDownListTIME_FROM'))
+                    selectTimeFrom.select_by_visible_text(qop[2])
+                    selectTimeTo = Select(browser.find_element_by_name('DropDownListTIME_TO'))
+                    selectTimeTo.select_by_visible_text(qop[3])
+                    # time.sleep(int(delaytime))
+                    browser.find_element_by_id('btnAddLine').click()  #添加明细
+                    time.sleep(3)  #延时，防止提交按钮丢失
+                    browser.find_element_by_id('btnPost').click()  #提交
+                    print('%s号加班申请完成...' % (qop[0]))
+                    # browser.find_element_by_id('btnCancel').click()  #取消申请
+                else:
+                    firstOvertimeFlag = False
+                    browser.find_element_by_id(calendarDict[qop[0]]).click()
+                    browser.switch_to_default_content()
+                    browser.switch_to_frame('main')
+                    browser.find_element_by_name('TextBoxREASON').send_keys(qop[4])  #输入加班事由
+                    browser.find_element_by_id('TextBoxDATE_TO').click()
+                    browser.switch_to_frame('CalFrame')  #切换frame进入日历
+                    browser.find_element_by_xpath(r'//img[@src="prev.gif"]').click()  #点击日历中上个月箭头切换至上个月的日历信息
+                    browser.find_element_by_id(calendarDict[qop[0]]).click()
+                    browser.switch_to_default_content()
+                    browser.switch_to_frame('main')
+                    selectTimeFrom = Select(browser.find_element_by_name('DropDownListTIME_FROM'))
+                    selectTimeFrom.select_by_visible_text(qop[2])
+                    selectTimeTo = Select(browser.find_element_by_name('DropDownListTIME_TO'))
+                    selectTimeTo.select_by_visible_text(qop[3])
+                    # time.sleep(int(delaytime))
+                    browser.find_element_by_id('btnAddLine').click()  #添加明细
+                    time.sleep(3)  #延时，防止提交按钮丢失
+                    browser.find_element_by_id('btnPost').click()  #提交
+                    print('%s号加班申请完成...' % (qop[0]))
+                    # browser.find_element_by_id('btnCancel').click()  #取消申请
 
     #退出浏览器
     browser.quit()
